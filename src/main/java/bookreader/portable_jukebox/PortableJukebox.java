@@ -2,12 +2,10 @@ package bookreader.portable_jukebox;
 
 import bookreader.portable_jukebox.item.PortableJukeboxItem;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.core.util.collection.NamespaceID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import turniplabs.halplibe.helper.ItemBuilder;
-import turniplabs.halplibe.util.ClientStartEntrypoint;
 import turniplabs.halplibe.util.GameStartEntrypoint;
 import turniplabs.halplibe.util.RecipeEntrypoint;
 
