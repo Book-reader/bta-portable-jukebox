@@ -8,6 +8,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.PlayerLocal;
+import net.minecraft.client.gui.hud.HudIngame;
 import net.minecraft.client.option.GameSettings;
 import net.minecraft.client.sound.SoundCategoryHelper;
 import net.minecraft.client.sound.SoundEngine;
@@ -15,14 +16,18 @@ import net.minecraft.client.sound.SoundEntry;
 import net.minecraft.client.sound.SoundRepository;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.Item;
+import net.minecraft.core.item.ItemDiscMusic;
 import net.minecraft.core.item.ItemStack;
+import net.minecraft.core.item.Items;
+import net.minecraft.core.lang.I18n;
 import net.minecraft.core.sound.SoundCategory;
 import net.minecraft.core.world.World;
 import paulscode.sound.SoundSystem;
 
 public class PortableJukeboxItem extends Item {
 	public PortableJukeboxItem() {
-		super("portable_jukebox", PortableJukebox.makeItemNamespace("portable_jukebox"), 29835);
+		super("item.portable_jukebox", PortableJukebox.makeItemNamespace("portable_jukebox"), 29835);
+		this.setMaxStackSize(1);
 	}
 
 	@Override
@@ -31,6 +36,7 @@ public class PortableJukeboxItem extends Item {
 		if (!world.isClientSide) {
 			try
 			{
+				ItemDiscMusic record = (ItemDiscMusic)Items.RECORD_DOG;
 				Field mc_field = PlayerLocal.class.getDeclaredField("mc");
 				mc_field.setAccessible(true);
 				Minecraft mc = (Minecraft)mc_field.get((PlayerLocal)entityplayer);
@@ -45,18 +51,28 @@ public class PortableJukeboxItem extends Item {
 				lock.setAccessible(true);
 
 				SoundSystem soundSystem = SoundEngine.getSoundSystem();
-				SoundEntry dog = SoundRepository.SOUNDS.getSoundEntry("record.dog");
+				SoundEntry record_sound = SoundRepository.SOUNDS.getSoundEntry(record.recordName);
 				try
 				{
 					((Lock)lock.get(null)).lock();
 					if (soundSystem.playing(SoundEngine.BG_MUSIC)) soundSystem.stop(SoundEngine.BG_MUSIC);
-					soundSystem.backgroundMusic(SoundEngine.BG_MUSIC, dog.getURL(), dog.name, false);
-					soundSystem.setPitch(SoundEngine.BG_MUSIC, dog.pitch);
-					soundSystem.setVolume(SoundEngine.BG_MUSIC, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, (GameSettings)options.get(end)) * dog.volume);
+					soundSystem.backgroundMusic(SoundEngine.BG_MUSIC, record_sound.getURL(), record_sound.name, false);
+					soundSystem.setPitch(SoundEngine.BG_MUSIC, record_sound.pitch);
+					soundSystem.setVolume(SoundEngine.BG_MUSIC, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, (GameSettings)options.get(end)) * record_sound.volume);
 					soundSystem.play(SoundEngine.BG_MUSIC);
 				} finally
 				{
 					((Lock)lock.get(null)).unlock();
+				}
+
+				Field hudIngame = Minecraft.class.getDeclaredField("hudIngame");
+				if (record.recordAuthor != null)
+				{
+					((HudIngame) hudIngame.get(mc)).setRecordPlayingMessage(record.recordAuthor + " - " + I18n.getInstance().translateKey(record.recordName));
+				}
+				else
+				{
+					((HudIngame) hudIngame.get(mc)).setRecordPlayingMessage(I18n.getInstance().translateKey(record.getKey()));
 				}
 				PortableJukebox.LOGGER.info("Music should be playing");
 			}

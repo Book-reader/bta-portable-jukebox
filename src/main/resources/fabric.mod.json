@@ -6,7 +6,7 @@
   "name": "Example Mod",
   "description": "This mod aims to help new BTA modders.",
   "authors": [
-    "Turnip Labs"
+    "Book-reader"
   ],
   "contact": {
     "homepage": "",
@@ -29,7 +29,11 @@
 		],
 		"recipesReady": [
 			"bookreader.portable_jukebox.PortableJukebox"
-		]
+		],
+    "initModels": [
+      "bookreader.portable_jukebox.PortableJukebox"
+    ]
+
 	},
   "mixins": [
       "portable_jukebox.mixins.json"
@@ -37,7 +41,8 @@
 
   "depends": {
 		"minecraft": "*",
-    "fabricloader": ">=0.15.5"
+    "fabricloader": ">=0.15.5",
+    "halplibe": ">=5.2.4"
   },
   "suggests": {
   }
