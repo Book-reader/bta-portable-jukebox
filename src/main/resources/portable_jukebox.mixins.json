@@ -1,11 +1,12 @@
 {
     "required": true,
     "minVersion": "0.8",
-    "package": "turniplabs.examplemod.mixin",
+    "package": "bookreader.portable_jukebox.mixin",
     "compatibilityLevel": "JAVA_8",
     "mixins": [
     ],
     "client": [
+      "DisableDirectionWithAttModelZero"
     ],
     "injectors": {
         "defaultRequire": 1

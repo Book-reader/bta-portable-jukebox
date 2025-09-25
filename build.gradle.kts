@@ -90,7 +90,7 @@ dependencies {
     minecraft("::${bta_version}")
     mappings(loom.layered {})
 
-    modRuntimeOnly("objects:client:43db9b498cb67058d2e12d394e6507722e71bb45") // https://piston-data.mojang.com/v1/objects/43db9b498cb67058d2e12d394e6507722e71bb45/client.jar
+    /*modRuntimeOnly*/modImplementation("objects:client:43db9b498cb67058d2e12d394e6507722e71bb45") // https://piston-data.mojang.com/v1/objects/43db9b498cb67058d2e12d394e6507722e71bb45/client.jar
     modImplementation("net.fabricmc:fabric-loader:$loader_version")
 
     // Helper library
@@ -128,6 +128,7 @@ dependencies {
     implementation("org.lwjgl:lwjgl-openal:$lwjglVersion")
     implementation("org.lwjgl:lwjgl-opengl:$lwjglVersion")
     implementation("org.lwjgl:lwjgl-stb:$lwjglVersion")
+    // implementation("com.github.NullNoname:Paulscode-SoundSystem:2013.04.17-unofficial")
 }
 
 java {

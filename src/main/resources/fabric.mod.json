@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "examplemod",
+  "id": "portable_jukebox",
   "version": "${version}",
 
   "name": "Example Mod",
@@ -19,20 +19,20 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-			"turniplabs.examplemod.ExampleMod"
+			"bookreader.portable_jukebox.PortableJukebox"
     ],
 		"beforeGameStart": [
-			"turniplabs.examplemod.ExampleMod"
+			"bookreader.portable_jukebox.PortableJukebox"
 		],
 		"afterGameStart": [
-			"turniplabs.examplemod.ExampleMod"
+			"bookreader.portable_jukebox.PortableJukebox"
 		],
 		"recipesReady": [
-			"turniplabs.examplemod.ExampleMod"
+			"bookreader.portable_jukebox.PortableJukebox"
 		]
 	},
   "mixins": [
-      "examplemod.mixins.json"
+      "portable_jukebox.mixins.json"
   ],
 
   "depends": {
