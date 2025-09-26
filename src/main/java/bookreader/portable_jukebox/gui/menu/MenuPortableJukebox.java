@@ -32,7 +32,7 @@ public class MenuPortableJukebox extends MenuAbstract {
 
         for (int i = 0; i < storage.getContainerSize(); i++)
         {
-            this.addSlot(new SlotPortableJukebox(storage, i, 10 + (i * 18), 20));
+            this.addSlot(new SlotPortableJukebox(storage, i, 20 + (i * 18), 20));
         }
 
         for (int i = 0; i < 3; ++i)

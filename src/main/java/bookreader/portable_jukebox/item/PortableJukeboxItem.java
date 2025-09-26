@@ -49,15 +49,15 @@ public class PortableJukeboxItem extends Item {
 				mc_field.setAccessible(true);
 				Minecraft mc = (Minecraft)mc_field.get((PlayerLocal)player);
 
-				if (player.isSneaking())
+				// if (player.isSneaking())
 				{
 					mc.displayScreen(new ScreenPortableJukebox(player.inventory, itemstack));
 					return itemstack;
 				}
-				ItemDiscMusic record = getDisk(itemstack);
-				if (record == null) return itemstack;
+				// ItemDiscMusic record = getPlayingDisk(itemstack);
+				// if (record == null) return itemstack;
 
-				SoundUtils.playRecordAt(record, player);
+				// SoundUtils.playRecordAt(record, player);
 			}
 			catch (Exception e)
 			{
@@ -67,7 +67,7 @@ public class PortableJukeboxItem extends Item {
         return itemstack;
     }
 
-	ItemDiscMusic getDisk(ItemStack stack)
+	public ItemDiscMusic getPlayingDisk(ItemStack stack)
 	{
 		CompoundTag disks = stack.getData().getCompound("Disks");
 		if (disks == null) return null;

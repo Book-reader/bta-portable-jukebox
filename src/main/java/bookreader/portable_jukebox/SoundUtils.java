@@ -21,18 +21,56 @@ import paulscode.sound.SoundSystem;
 
 @Environment(EnvType.CLIENT)
 public class SoundUtils {
-    public static String SOUND_CATEGORY = SoundEngine.BG_MUSIC; //"PortableMusic";
+    public static final String SOUND_CATEGORY = "PortableMusic";
+    private static boolean started = false;
+    private static boolean paused = false;
+    private static ItemDiscMusic current_record;
+    private static final Minecraft mc = Minecraft.getMinecraft();
+
+    private static final SoundSystem snd = SoundEngine.getSoundSystem();
+
+    public static boolean playing()
+    {
+        return snd.playing(SOUND_CATEGORY);
+    }
+
+    public static void pause()
+    {
+        paused = true;
+        snd.pause(SOUND_CATEGORY);
+    }
+
+    public static void unpause()
+    {
+        paused = false;
+        snd.play(SOUND_CATEGORY);
+    }
+
+    public static void stop()
+    {
+        paused = false;
+        started = false;
+        snd.stop(SOUND_CATEGORY);
+    }
+
+    public static boolean started()
+    {
+        if (started && !playing() && !paused) started = false;
+        return started;
+    }
+
+    public static ItemDiscMusic currentRecord()
+    {
+        return current_record;
+    }
 
     public static void playRecordAt(ItemDiscMusic record, Player player)
     {
         try
         {
-            Field mc_field = PlayerLocal.class.getDeclaredField("mc");
-            mc_field.setAccessible(true);
-            Minecraft mc = (Minecraft)mc_field.get((PlayerLocal)player);
-            Field options = SoundEngine.class.getDeclaredField("options");
-            options.setAccessible(true);
-
+            started = true;
+            paused = false;
+            current_record = record;
             Field lock = SoundEngine.class.getDeclaredField("lock");
             lock.setAccessible(true);
 
@@ -44,7 +82,7 @@ public class SoundUtils {
                 if (soundSystem.playing(SoundUtils.SOUND_CATEGORY)) soundSystem.stop(SoundUtils.SOUND_CATEGORY);
                 soundSystem.backgroundMusic(SoundUtils.SOUND_CATEGORY, record_sound.getURL(), record_sound.name, false);
                 soundSystem.setPitch(SoundUtils.SOUND_CATEGORY, record_sound.pitch);
-                soundSystem.setVolume(SoundUtils.SOUND_CATEGORY, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, (GameSettings)options.get(mc.sndManager)) * record_sound.volume);
+                soundSystem.setVolume(SoundUtils.SOUND_CATEGORY, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, mc.gameSettings) * record_sound.volume);
                 soundSystem.play(SoundUtils.SOUND_CATEGORY);
             } finally
             {

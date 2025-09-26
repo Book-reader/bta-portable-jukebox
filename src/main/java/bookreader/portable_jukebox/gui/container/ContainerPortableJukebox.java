@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import com.mojang.nbt.tags.CompoundTag;
 
 import bookreader.portable_jukebox.PortableJukebox;
+import bookreader.portable_jukebox.SoundUtils;
 import bookreader.portable_jukebox.item.PortableJukeboxItem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -63,10 +64,11 @@ public class ContainerPortableJukebox implements Container {
 
     @Override
     public void setChanged() {
-        // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method 'setChanged'");
+        if (storage[0] == null || !SoundUtils.currentRecord().equals(storage[0].getItem()))
+        {
+            SoundUtils.stop();
+        }
         writeNbt();
-        PortableJukebox.LOGGER.info("TODO: PortableJukeboxContainer.setChanged");
     }
 
     @Override
