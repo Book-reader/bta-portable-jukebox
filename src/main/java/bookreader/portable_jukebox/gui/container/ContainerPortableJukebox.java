@@ -64,7 +64,7 @@ public class ContainerPortableJukebox implements Container {
 
     @Override
     public void setChanged() {
-        if (storage[0] == null || !SoundUtils.currentRecord().equals(storage[0].getItem()))
+        if (storage[0] == null || storage[0].getItem() == null || !storage[0].getItem().equals(SoundUtils.currentRecord()))
         {
             SoundUtils.stop();
         }

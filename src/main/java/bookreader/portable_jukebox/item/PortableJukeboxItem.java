@@ -31,7 +31,6 @@ import net.minecraft.core.player.inventory.menu.MenuAbstract;
 import net.minecraft.core.player.inventory.slot.Slot;
 import net.minecraft.core.sound.SoundCategory;
 import net.minecraft.core.world.World;
-import paulscode.sound.SoundSystem;
 
 public class PortableJukeboxItem extends Item {
 	public PortableJukeboxItem() {

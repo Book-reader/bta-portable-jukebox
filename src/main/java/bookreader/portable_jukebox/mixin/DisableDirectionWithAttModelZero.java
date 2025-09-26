@@ -35,7 +35,7 @@ public class DisableDirectionWithAttModelZero extends Source
     @Shadow
     private boolean checkALError() {throw new AssertionError();}
 
-    @Inject(method = "positionChanged()V", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "positionChanged()V", at = @At("HEAD"))
     public void positionChanged(CallbackInfo info)
     {
         if (this.attModel == 0 && this.sourcename == SoundUtils.SOUND_CATEGORY && !this.listenerPosition.equals(this.sourcePosition))
@@ -50,6 +50,5 @@ public class DisableDirectionWithAttModelZero extends Source
                 this.checkALError();
             }
         }   
-        info.cancel();
     }
 }
