@@ -1,6 +1,7 @@
 package bookreader.portable_jukebox;
 
 import java.lang.reflect.Field;
+import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 
 import bookreader.portable_jukebox.gui.screen.ScreenPortableJukebox;
@@ -26,36 +27,55 @@ public class SoundUtils {
     private static boolean paused = false;
     private static ItemDiscMusic current_record;
     private static final Minecraft mc = Minecraft.getMinecraft();
+    private static final Lock LOCK = getLock();
 
     private static final SoundSystem snd = SoundEngine.getSoundSystem();
 
     public static boolean playing()
     {
-        return snd.playing(SOUND_CATEGORY);
+        return inLock(() -> snd.playing(SOUND_CATEGORY));
     }
 
     public static void pause()
     {
-        paused = true;
-        snd.pause(SOUND_CATEGORY);
+        inLock(() -> {
+            paused = true;
+            snd.pause(SOUND_CATEGORY);
+            return null;
+        });
     }
 
     public static void unpause()
     {
-        paused = false;
-        snd.play(SOUND_CATEGORY);
+        inLock(() -> {
+            paused = false;
+            snd.play(SOUND_CATEGORY);
+            return null;
+        });
     }
 
     public static void stop()
     {
-        paused = false;
-        started = false;
-        snd.stop(SOUND_CATEGORY);
+        inLock(() -> {
+            paused = false;
+            started = false;
+            snd.stop(SOUND_CATEGORY);
+            return null;
+        });
     }
 
     public static boolean started()
     {
-        if (started && !playing() && !paused) started = false;
+        if (started && !playing() && !paused)
+        {
+            PortableJukebox.LOGGER.info("setting started to false");
+            started = false;
+        }
+        return started;
+    }
+
+    public static boolean started_noupdate()
+    {
         return started;
     }
 
@@ -68,25 +88,22 @@ public class SoundUtils {
     {
         try
         {
-            started = true;
-            paused = false;
-            current_record = record;
-            Field lock = SoundEngine.class.getDeclaredField("lock");
-            lock.setAccessible(true);
-
             SoundSystem soundSystem = SoundEngine.getSoundSystem();
             SoundEntry record_sound = SoundRepository.SOUNDS.getSoundEntry(record.recordName);
             try
             {
-                ((Lock)lock.get(null)).lock();
-                if (soundSystem.playing(SoundUtils.SOUND_CATEGORY)) soundSystem.stop(SoundUtils.SOUND_CATEGORY);
-                soundSystem.backgroundMusic(SoundUtils.SOUND_CATEGORY, record_sound.getURL(), record_sound.name, false);
-                soundSystem.setPitch(SoundUtils.SOUND_CATEGORY, record_sound.pitch);
-                soundSystem.setVolume(SoundUtils.SOUND_CATEGORY, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, mc.gameSettings) * record_sound.volume);
-                soundSystem.play(SoundUtils.SOUND_CATEGORY);
+                LOCK.lock();
+                started = true;
+                paused = false;
+                current_record = record;
+                if (soundSystem.playing(SOUND_CATEGORY)) soundSystem.stop(SOUND_CATEGORY);
+                soundSystem.backgroundMusic(SOUND_CATEGORY, record_sound.getURL(), record_sound.name, false);
+                soundSystem.setPitch(SOUND_CATEGORY, record_sound.pitch);
+                soundSystem.setVolume(SOUND_CATEGORY, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, mc.gameSettings) * record_sound.volume);
+                soundSystem.play(SOUND_CATEGORY);
             } finally
             {
-                ((Lock)lock.get(null)).unlock();
+                LOCK.unlock();
             }
 
             if (record.recordAuthor != null)
@@ -101,6 +118,37 @@ public class SoundUtils {
         catch (Exception e)
         {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static Lock getLock()
+    {
+        try
+        {
+            Field lock = SoundEngine.class.getDeclaredField("lock");
+            lock.setAccessible(true);
+            return (Lock)lock.get(null);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static <T> T inLock(Callable<T> callable)
+    {
+        try
+        {
+            LOCK.lock();
+            return callable.call();
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+        finally
+        {
+            LOCK.unlock();
         }
     }
 }

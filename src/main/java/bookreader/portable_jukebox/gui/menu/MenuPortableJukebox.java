@@ -30,9 +30,15 @@ public class MenuPortableJukebox extends MenuAbstract {
         this.portable_jukebox_item = portable_jukebox_item;
         storage = new ContainerPortableJukebox(portable_jukebox_item);
 
-        for (int i = 0; i < storage.getContainerSize(); i++)
+
+        this.addSlot(new SlotPortableJukebox(storage, 0, 8, 8));
+
+        for (int i = 0; i < 3; ++i)
         {
-            this.addSlot(new SlotPortableJukebox(storage, i, 20 + (i * 18), 20));
+            for (int j = 0; j < 3; ++j) {
+                // this.addSlot(new Slot(inventory, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
+                this.addSlot(new SlotPortableJukebox(storage, j + i * 3 + 1, (8 + 6 * 18) + j * 18, (84 - 18 * 3 - 4) + i * 18));
+            }
         }
 
         for (int i = 0; i < 3; ++i)
@@ -46,8 +52,6 @@ public class MenuPortableJukebox extends MenuAbstract {
         {
             this.addSlot(new Slot(inventory, i, 8 + i * 18, 142));
         }
-        // this.disk = disk;
-        // this.addSlot(new Slot(new MenuContainer(playerContainer, container)));
     }
 
     @Override

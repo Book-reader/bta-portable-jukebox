@@ -30,8 +30,8 @@ public class ScreenPortableJukebox extends ScreenContainerAbstract {
         this.left = (this.width - this.xSize) / 2;
         this.top = (this.height - this.ySize) / 2;
         this.buttons.clear();
-        // TODO: add reset button that clears the song
-        this.buttons.add(new ButtonElement(0, left, top, 20, 20, "||")); // I18n.getInstance().translateKey("gui.achievements.button.done")
+        this.buttons.add(new ButtonElement(0, left + 7 + 18 + 1, top + 7, 18, 18, "||")); // I18n.getInstance().translateKey("gui.achievements.button.done")
+        this.buttons.add(new ButtonElement(1, left + 7 + (18 + 1) * 2, top + 7, 18, 18, "<"));
     }
 
     @Override
@@ -56,6 +56,11 @@ public class ScreenPortableJukebox extends ScreenContainerAbstract {
                 PortableJukebox.LOGGER.info("Unpaused song");
             }
         }
+        else if (button.id == 1 && button.enabled)
+        {
+            PortableJukebox.LOGGER.info("Stopping track");
+            SoundUtils.stop();
+        }
         super.buttonClicked(button);
     }
 
@@ -68,13 +73,16 @@ public class ScreenPortableJukebox extends ScreenContainerAbstract {
         {
             buttons.get(0).displayString = "||";
         }
+        // TODO: there has to be a better way
+        buttons.get(1).enabled = SoundUtils.started_noupdate();
         super.render(mx, my, partialTick);
     }
 
     // private ItemDiscMusic disc;
     @Override
     protected void drawGuiContainerBackgroundLayer(float f) {
-        this.mc.textureManager.loadTexture("/gui/container.png").bind();
-        this.drawTexturedModalRect(left, top, 0, 0, this.xSize, this.ySize);
+        // this.mc.textureManager.loadTexture("/gui/container.png").bind();
+        this.mc.textureManager.loadTexture("/assets/portable_jukebox/textures/gui/container/portable_jukebox_screen.png").bind();
+        this.drawTexturedModalRect(left, top, 0, 0, this.xSize, this.ySize/*, 0.006, 0.006*/);
     }
 }
