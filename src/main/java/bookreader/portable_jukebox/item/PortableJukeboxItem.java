@@ -7,6 +7,7 @@ import java.util.concurrent.locks.Lock;
 import com.mojang.nbt.tags.CompoundTag;
 
 import bookreader.portable_jukebox.PortableJukebox;
+import bookreader.portable_jukebox.SoundUtils;
 import bookreader.portable_jukebox.gui.menu.MenuPortableJukebox;
 import bookreader.portable_jukebox.gui.screen.ScreenPortableJukebox;
 import net.fabricmc.api.EnvType;
@@ -40,53 +41,23 @@ public class PortableJukeboxItem extends Item {
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public ItemStack onUseItem(ItemStack itemstack, World world, Player entityplayer) {
+	public ItemStack onUseItem(ItemStack itemstack, World world, Player player) {
 		if (!world.isClientSide) {
 			try
 			{
 				Field mc_field = PlayerLocal.class.getDeclaredField("mc");
 				mc_field.setAccessible(true);
-				Minecraft mc = (Minecraft)mc_field.get((PlayerLocal)entityplayer);
+				Minecraft mc = (Minecraft)mc_field.get((PlayerLocal)player);
 
-				if (entityplayer.isSneaking())
+				if (player.isSneaking())
 				{
-					mc.displayScreen(new ScreenPortableJukebox(entityplayer.inventory, itemstack));
+					mc.displayScreen(new ScreenPortableJukebox(player.inventory, itemstack));
 					return itemstack;
 				}
 				ItemDiscMusic record = getDisk(itemstack);
 				if (record == null) return itemstack;
 
-
-				Field options = SoundEngine.class.getDeclaredField("options");
-				options.setAccessible(true);
-
-				Field lock = SoundEngine.class.getDeclaredField("lock");
-				lock.setAccessible(true);
-
-				SoundSystem soundSystem = SoundEngine.getSoundSystem();
-				SoundEntry record_sound = SoundRepository.SOUNDS.getSoundEntry(record.recordName);
-				try
-				{
-					((Lock)lock.get(null)).lock();
-					if (soundSystem.playing(SoundEngine.BG_MUSIC)) soundSystem.stop(SoundEngine.BG_MUSIC);
-					soundSystem.backgroundMusic(SoundEngine.BG_MUSIC, record_sound.getURL(), record_sound.name, false);
-					soundSystem.setPitch(SoundEngine.BG_MUSIC, record_sound.pitch);
-					soundSystem.setVolume(SoundEngine.BG_MUSIC, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, (GameSettings)options.get(mc.sndManager)) * record_sound.volume);
-					soundSystem.play(SoundEngine.BG_MUSIC);
-				} finally
-				{
-					((Lock)lock.get(null)).unlock();
-				}
-
-				if (record.recordAuthor != null)
-				{
-					mc.hudIngame.setRecordPlayingMessage(record.recordAuthor + " - " + I18n.getInstance().translateKey(record.recordName));
-				}
-				else
-				{
-					mc.hudIngame.setRecordPlayingMessage(I18n.getInstance().translateKey(record.getKey()));
-				}
-				PortableJukebox.LOGGER.info("Music should be playing");
+				SoundUtils.playRecordAt(record, player);
 			}
 			catch (Exception e)
 			{

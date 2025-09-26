@@ -9,6 +9,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import bookreader.portable_jukebox.SoundUtils;
+import bookreader.portable_jukebox.item.PortableJukeboxItem;
 import net.betterthanadventure.sound.ChannelLWJGL3OpenAL;
 import net.betterthanadventure.sound.SourceLWJGL3OpenAL;
 import net.minecraft.client.sound.SoundEngine;
@@ -36,7 +38,7 @@ public class DisableDirectionWithAttModelZero extends Source
     @Inject(method = "positionChanged()V", at = @At("HEAD"), cancellable = true)
     public void positionChanged(CallbackInfo info)
     {
-        if (this.attModel == 0 && this.sourcename == SoundEngine.BG_MUSIC && !this.listenerPosition.equals(this.sourcePosition))
+        if (this.attModel == 0 && this.sourcename == SoundUtils.SOUND_CATEGORY && !this.listenerPosition.equals(this.sourcePosition))
         {
             this.distanceFromListener = 0.0f;
             if (this.channel != null && this.channel.attachedSource == this && this.channelOpenAL != null && this.channelOpenAL.ALSource != null)
