@@ -1,6 +1,7 @@
 package bookreader.portable_jukebox.mixin;
 
 import java.nio.FloatBuffer;
+import java.util.Objects;
 
 import org.lwjgl.openal.AL10;
 import org.spongepowered.asm.mixin.Mixin;
@@ -38,7 +39,7 @@ public class DisableDirectionWithAttModelZero extends Source
     @Inject(method = "positionChanged()V", at = @At("HEAD"))
     public void positionChanged(CallbackInfo info)
     {
-        if (this.attModel == 0 && this.sourcename == SoundUtils.SOUND_CATEGORY && !this.listenerPosition.equals(this.sourcePosition))
+        if (this.attModel == 0 && Objects.equals(this.sourcename, SoundUtils.SOUND_CATEGORY) && !this.listenerPosition.equals(this.sourcePosition))
         {
             this.distanceFromListener = 0.0f;
             if (this.channel != null && this.channel.attachedSource == this && this.channelOpenAL != null && this.channelOpenAL.ALSource != null)
@@ -49,6 +50,6 @@ public class DisableDirectionWithAttModelZero extends Source
                 AL10.alSourcefv(this.channelOpenAL.ALSource.get(0), AL10.AL_POSITION, this.sourcePosition);
                 this.checkALError();
             }
-        }   
+        }
     }
 }

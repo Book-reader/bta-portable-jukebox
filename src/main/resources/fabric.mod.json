@@ -31,7 +31,7 @@
 			"bookreader.portable_jukebox.PortableJukebox"
 		],
     "initModels": [
-      "bookreader.portable_jukebox.PortableJukebox"
+      "bookreader.portable_jukebox.PortableJukeboxClient"
     ]
 
 	},

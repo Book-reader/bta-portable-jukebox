@@ -2,12 +2,16 @@
     "required": true,
     "minVersion": "0.8",
     "package": "bookreader.portable_jukebox.mixin",
-    "compatibilityLevel": "JAVA_8",
+    "compatibilityLevel": "JAVA_17",
     "mixins": [
+      "PlayerServerMixin",
+      "PlayerMixin",
+      "ContainerInventoryMixin"
     ],
     "client": [
       "DisableDirectionWithAttModelZero",
-      "SoundEngineMixin"
+      "SoundEngineMixin",
+      "PlayerLocalMixin"
     ],
     "injectors": {
         "defaultRequire": 1

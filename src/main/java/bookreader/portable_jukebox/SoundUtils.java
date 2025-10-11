@@ -5,6 +5,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 
 import bookreader.portable_jukebox.gui.screen.ScreenPortableJukebox;
+import bookreader.portable_jukebox.util.Util;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -18,6 +19,7 @@ import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.ItemDiscMusic;
 import net.minecraft.core.lang.I18n;
 import net.minecraft.core.sound.SoundCategory;
+import org.jetbrains.annotations.NotNull;
 import paulscode.sound.SoundSystem;
 
 @Environment(EnvType.CLIENT)
@@ -26,10 +28,11 @@ public class SoundUtils {
     private static boolean started = false;
     private static boolean paused = false;
     private static ItemDiscMusic current_record;
-    private static final Minecraft mc = Minecraft.getMinecraft();
+    private static final Minecraft mc = Util.getMinecraft();
     private static final Lock LOCK = getLock();
 
-    private static final SoundSystem snd = SoundEngine.getSoundSystem();
+    @SuppressWarnings("DataFlowIssue")
+	private static final @NotNull SoundSystem snd = SoundEngine.getSoundSystem();
 
     public static boolean playing()
     {
@@ -88,7 +91,6 @@ public class SoundUtils {
     {
         try
         {
-            SoundSystem soundSystem = SoundEngine.getSoundSystem();
             SoundEntry record_sound = SoundRepository.SOUNDS.getSoundEntry(record.recordName);
             try
             {
@@ -96,11 +98,11 @@ public class SoundUtils {
                 started = true;
                 paused = false;
                 current_record = record;
-                if (soundSystem.playing(SOUND_CATEGORY)) soundSystem.stop(SOUND_CATEGORY);
-                soundSystem.backgroundMusic(SOUND_CATEGORY, record_sound.getURL(), record_sound.name, false);
-                soundSystem.setPitch(SOUND_CATEGORY, record_sound.pitch);
-                soundSystem.setVolume(SOUND_CATEGORY, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, mc.gameSettings) * record_sound.volume);
-                soundSystem.play(SOUND_CATEGORY);
+                if (snd.playing(SOUND_CATEGORY)) snd.stop(SOUND_CATEGORY);
+                snd.backgroundMusic(SOUND_CATEGORY, record_sound.getURL(), record_sound.name, false);
+                snd.setPitch(SOUND_CATEGORY, record_sound.pitch);
+                snd.setVolume(SOUND_CATEGORY, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, mc.gameSettings) * record_sound.volume);
+                snd.play(SOUND_CATEGORY);
             } finally
             {
                 LOCK.unlock();

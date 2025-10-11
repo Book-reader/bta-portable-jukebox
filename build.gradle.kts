@@ -90,7 +90,7 @@ dependencies {
     minecraft("::${bta_version}")
     mappings(loom.layered {})
 
-    /*modRuntimeOnly*/modImplementation("objects:client:43db9b498cb67058d2e12d394e6507722e71bb45") // https://piston-data.mojang.com/v1/objects/43db9b498cb67058d2e12d394e6507722e71bb45/client.jar
+    modImplementation("objects:client:43db9b498cb67058d2e12d394e6507722e71bb45") // https://piston-data.mojang.com/v1/objects/43db9b498cb67058d2e12d394e6507722e71bb45/client.jar
     modImplementation("net.fabricmc:fabric-loader:$loader_version")
 
     // Helper library
@@ -133,12 +133,12 @@ dependencies {
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_17
     withSourcesJar()
 }
 
 tasks.compileJava {
-    options.release.set(8)
+    options.release.set(17)
 }
 
 tasks.jar {
