@@ -3,6 +3,8 @@ package bookreader.portable_jukebox;
 import bookreader.portable_jukebox.item.PortableJukeboxItem;
 import bookreader.portable_jukebox.packet.OpenGuiPacketS2C;
 import bookreader.portable_jukebox.packet.SaveNBTPacketC2S;
+import bookreader.portable_jukebox.packet.SongControlPacketC2S;
+import bookreader.portable_jukebox.packet.SongControlPacketS2C;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.core.item.Item;
@@ -23,8 +25,10 @@ public class PortableJukebox implements ModInitializer, RecipeEntrypoint, GameSt
     @Override
     public void onInitialize() {
         LOGGER.info("portable_jukebox initialized.");
-		NetworkHandler.registerNetworkMessage(() -> new OpenGuiPacketS2C());
-		NetworkHandler.registerNetworkMessage(() -> new SaveNBTPacketC2S());
+		NetworkHandler.registerNetworkMessage(OpenGuiPacketS2C::new);
+		NetworkHandler.registerNetworkMessage(SaveNBTPacketC2S::new);
+		NetworkHandler.registerNetworkMessage(SongControlPacketS2C::new);
+		NetworkHandler.registerNetworkMessage(SongControlPacketC2S::new);
 		// PacketContainerSetContent
     }
 

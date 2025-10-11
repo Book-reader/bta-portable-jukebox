@@ -20,49 +20,75 @@ import net.minecraft.core.item.ItemDiscMusic;
 import net.minecraft.core.lang.I18n;
 import net.minecraft.core.sound.SoundCategory;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import paulscode.sound.CommandObject;
 import paulscode.sound.SoundSystem;
 
 @Environment(EnvType.CLIENT)
 public class SoundUtils {
     public static final String SOUND_CATEGORY = "PortableMusic";
-    private static boolean started = false;
-    private static boolean paused = false;
-    private static ItemDiscMusic current_record;
-    private static final Minecraft mc = Util.getMinecraft();
-    private static final Lock LOCK = getLock();
+//	public static final int SOUND_COMMAND = SOUND_CATEGORY.hashCode();
 
-    @SuppressWarnings("DataFlowIssue")
-	private static final @NotNull SoundSystem snd = SoundEngine.getSoundSystem();
+	private static boolean started = false;
+	private static boolean paused = false;
+	private static ItemDiscMusic current_record;
+	private static final Minecraft mc = Minecraft.getMinecraft();
+	private static final Lock LOCK = getLock();
+
+	private static @Nullable SoundSystem get_snd()
+	{
+		return SoundEngine.getSoundSystem();
+	}
+//	private static final SoundSystem snd = SoundEngine.getSoundSystem();
 
     public static boolean playing()
     {
-        return inLock(() -> snd.playing(SOUND_CATEGORY));
+		SoundSystem s = get_snd();
+		if (s == null) return false;
+        return inLock(() -> s.playing(SOUND_CATEGORY));
     }
+
+//	// TODO: these methods belong in a separate class, same as the ability to play songs from a specific player in playRecordAt because these don't need to handle the pause state
+//	public static void pauseFrom(Player player)
+//	{
+//		throw new UnsupportedOperationException("TODO");
+//	}
+//
+//	public static void resumeFrom(Player player)
+//	{
+//		throw new UnsupportedOperationException("TODO");
+//	}
 
     public static void pause()
     {
+		SoundSystem s = get_snd();
+		if (s == null) return;
         inLock(() -> {
             paused = true;
-            snd.pause(SOUND_CATEGORY);
+            s.pause(SOUND_CATEGORY);
             return null;
         });
     }
 
     public static void unpause()
     {
+		SoundSystem s = get_snd();
+		if (s == null) return;
         inLock(() -> {
             paused = false;
-            snd.play(SOUND_CATEGORY);
+            s.play(SOUND_CATEGORY);
             return null;
         });
     }
 
     public static void stop()
     {
+		SoundSystem s = get_snd();
+		if (s == null) return;
         inLock(() -> {
             paused = false;
             started = false;
-            snd.stop(SOUND_CATEGORY);
+            s.stop(SOUND_CATEGORY);
             return null;
         });
     }
@@ -89,6 +115,8 @@ public class SoundUtils {
 
     public static void playRecordAt(ItemDiscMusic record, Player player)
     {
+		SoundSystem snd = get_snd();
+		if (snd == null) return;
         try
         {
             SoundEntry record_sound = SoundRepository.SOUNDS.getSoundEntry(record.recordName);
@@ -102,6 +130,7 @@ public class SoundUtils {
                 snd.backgroundMusic(SOUND_CATEGORY, record_sound.getURL(), record_sound.name, false);
                 snd.setPitch(SOUND_CATEGORY, record_sound.pitch);
                 snd.setVolume(SOUND_CATEGORY, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, mc.gameSettings) * record_sound.volume);
+
                 snd.play(SOUND_CATEGORY);
             } finally
             {

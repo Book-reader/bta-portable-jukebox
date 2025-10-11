@@ -4,18 +4,18 @@ import bookreader.portable_jukebox.PortableJukebox;
 import bookreader.portable_jukebox.SoundUtils;
 import bookreader.portable_jukebox.gui.menu.MenuPortableJukebox;
 import bookreader.portable_jukebox.item.PortableJukeboxItem;
+import bookreader.portable_jukebox.packet.SongControlPacketS2C;
+import bookreader.portable_jukebox.packet.SongControlPacketC2S;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.ButtonElement;
-import net.minecraft.client.gui.ItemElement;
 import net.minecraft.client.gui.container.ScreenContainerAbstract;
-import net.minecraft.client.util.helper.ItemDragHandler;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.ItemDiscMusic;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.player.inventory.container.ContainerInventory;
-import net.minecraft.core.player.inventory.menu.MenuInventory;
 import org.lwjgl.opengl.GL11;
+import turniplabs.halplibe.helper.network.NetworkHandler;
 
 @Environment(EnvType.CLIENT)
 public class ScreenPortableJukebox extends ScreenContainerAbstract {
@@ -59,25 +59,30 @@ public class ScreenPortableJukebox extends ScreenContainerAbstract {
                 ItemDiscMusic disk = ((PortableJukeboxItem)portable_jukebox_item.getItem()).getPlayingDisk(portable_jukebox_item);
                 if (disk != null)
                 {
-                    SoundUtils.playRecordAt(disk, player);
+//                    SoundUtils.playRecordAt(disk, player);
+//					if (mc.isMultiplayerWorld()) Net
+					NetworkHandler.sendToServer(new SongControlPacketC2S(player, disk, SongControlPacketS2C.SongAction.START_NEW));
                     PortableJukebox.LOGGER.debug("Started song");
                 }
             }
             else if (SoundUtils.playing())
             {
-                SoundUtils.pause();
+//                SoundUtils.pause();
+				NetworkHandler.sendToServer(new SongControlPacketC2S(player, SongControlPacketS2C.SongAction.PAUSE));
                 PortableJukebox.LOGGER.debug("Paused song");
             }
             else
             {
-                SoundUtils.unpause();
+//                SoundUtils.unpause();
+				NetworkHandler.sendToServer(new SongControlPacketC2S(player, SongControlPacketS2C.SongAction.RESUME));
                 PortableJukebox.LOGGER.debug("Unpaused song");
             }
         }
         else if (button.id == 1 && button.enabled)
         {
             PortableJukebox.LOGGER.debug("Stopping track");
-            SoundUtils.stop();
+			NetworkHandler.sendToServer(new SongControlPacketC2S(player, SongControlPacketS2C.SongAction.STOP));
+//            SoundUtils.stop();
         }
         super.buttonClicked(button);
     }

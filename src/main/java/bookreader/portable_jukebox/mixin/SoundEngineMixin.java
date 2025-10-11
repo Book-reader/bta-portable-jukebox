@@ -1,11 +1,22 @@
 package bookreader.portable_jukebox.mixin;
 
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 
 import javax.annotation.Nullable;
 
+import bookreader.portable_jukebox.iface.PlayDiscFromPlayer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.PlayerLocalMultiplayer;
+import net.minecraft.client.sound.SoundEntry;
+import net.minecraft.client.sound.SoundRepository;
+import net.minecraft.core.entity.Mob;
+import net.minecraft.core.entity.player.Player;
+import net.minecraft.core.item.ItemDiscMusic;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -24,9 +35,8 @@ import net.minecraft.client.sound.SoundEngine;
 import net.minecraft.core.sound.SoundCategory;
 import paulscode.sound.SoundSystem;
 @Mixin(value = SoundEngine.class, remap = false)
-@Environment(EnvType.CLIENT)
 // TODO: better handle the specific cases instead of mixining everything
-public class SoundEngineMixin
+public class SoundEngineMixin implements PlayDiscFromPlayer
 {
     @Shadow
     private static SoundSystem soundSystem;
@@ -34,18 +44,86 @@ public class SoundEngineMixin
     private @Nullable GameSettings options;
     @Shadow
     private static boolean loaded;
+	@Shadow
+	private Minecraft mc;
+	@Shadow
+	public void playMusic(SoundEntry entry, float x, float y, float z, float volume, float pitch) {throw new AssertionError();}
 
-    @WrapOperation(method = {"tick()V"}, at = @At(value = "INVOKE", target = "playing(Ljava/lang/String;)Z"))
+	@Unique
+	Map<Player, String> listeningDiscsFrom;
+
+	@Override
+	public void bta_portable_jukebox$playDiscFrom(ItemDiscMusic record, Player player)
+	{
+		if (listeningDiscsFrom == null) listeningDiscsFrom = new HashMap<>();
+
+		String category_name;
+		if (listeningDiscsFrom.containsKey(player))
+		{
+			category_name = listeningDiscsFrom.get(player);
+			soundSystem.stop(category_name);
+		}
+		else
+		{
+			category_name = SoundUtils.SOUND_CATEGORY + player.username;
+			listeningDiscsFrom.put(player, category_name);
+		}
+		SoundEntry record_sound = SoundRepository.SOUNDS.getSoundEntry(record.recordName);
+		assert record_sound != null;
+		this.playMusic(record_sound, (float)player.x, (float)player.y, (float)player.z, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, mc.gameSettings) * record_sound.volume, record_sound.pitch);
+//		this.playSoundWithIdAtPos(record_sound, category_name, player.x, player.y, player.z, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, mc.gameSettings) * record_sound.volume, record_sound.pitch, record_sound.name);
+//		soundSystem.play(category_name);
+	}
+
+	@Override
+	public void bta_portable_jukebox$pauseDiscFrom(Player player) {
+		if (listeningDiscsFrom != null && listeningDiscsFrom.containsKey(player))
+		{
+			soundSystem.stop(listeningDiscsFrom.get(player));
+		}
+	}
+
+	@Override
+	public void bta_portable_jukebox$resumeDiscFrom(Player player) {
+		if (listeningDiscsFrom != null && listeningDiscsFrom.containsKey(player))
+		{
+			soundSystem.play(listeningDiscsFrom.get(player));
+		}
+	}
+
+	@Inject(method = "updateListener(Lnet/minecraft/core/entity/Mob;F)V", at = @At(value = "INVOKE", target = "Ljava/util/concurrent/locks/Lock;unlock()V"))
+	void beforeUpdateListenerLock(Mob listener_player, float partialTick, CallbackInfo ci)
+	{
+		if (listeningDiscsFrom == null) return;
+		for (Map.Entry<Player, String> entry : listeningDiscsFrom.entrySet())
+		{
+			String category = entry.getValue();
+			if (soundSystem.playing(category))
+			{
+				Player player = entry.getKey();
+				PortableJukebox.LOGGER.info("Setting source position to x={}, y={}, z={}", player.x, player.y, player.z);
+				soundSystem.setPosition(category, (float) player.x, (float) player.y, (float) player.z);
+			}
+		}
+	}
+
+//	@Inject(method = "tick()V", at = @At(value = "INVOKE", target = "Ljava/util/concurrent/locks/Lock;unlock()V"))
+//	public void onTick(CallbackInfo ci)
+//	{
+//
+//	}
+
+/*    @WrapOperation(method = "tick()V", at = @At(value = "INVOKE", target = "playing(Ljava/lang/String;)Z"))
     public boolean soundSystemPlaying(SoundSystem system, String name, Operation<Boolean> original)
     {
-        if (name == SoundEngine.BG_MUSIC) return original.call(system, name) || system.playing(SoundUtils.SOUND_CATEGORY);
+        if (Objects.equals(name, SoundEngine.BG_MUSIC)) return original.call(system, name) || system.playing(SoundUtils.SOUND_CATEGORY);
         else return original.call(system, name);
     }
 
-    @WrapOperation(method = {"stopMusic()V"}, at = @At(value = "INVOKE", target = "stop(Ljava/lang/String;)V"))
+    @WrapOperation(method = "stopMusic()V", at = @At(value = "INVOKE", target = "stop(Ljava/lang/String;)V"))
     public void soundSystemStop(SoundSystem system, String name, Operation<Void> original)
     {
-        if (name == SoundEngine.BG_MUSIC && system.playing(SoundUtils.SOUND_CATEGORY))
+        if (Objects.equals(name, SoundEngine.BG_MUSIC) && system.playing(SoundUtils.SOUND_CATEGORY))
         {
             PortableJukebox.LOGGER.info("Stopping music!");
             system.stop(SoundUtils.SOUND_CATEGORY);
@@ -56,7 +134,7 @@ public class SoundEngineMixin
     @WrapOperation(method = "setMuted(Z)V", at = @At(value = "INVOKE", target = "setVolume(Ljava/lang/String;F)V"))
     public void soundSystemSetVolume(SoundSystem system, String name, float vol, Operation<Void> original)
     {
-        if (name == SoundEngine.BG_MUSIC) system.setVolume(SoundUtils.SOUND_CATEGORY, vol);
+        if (Objects.equals(name, SoundEngine.BG_MUSIC)) system.setVolume(SoundUtils.SOUND_CATEGORY, vol);
         original.call(system, name, vol);
     }
 
@@ -66,5 +144,5 @@ public class SoundEngineMixin
         if (soundSystem != null && loaded) {
             soundSystem.setVolume(SoundUtils.SOUND_CATEGORY, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, this.options));
         }
-    }
+    }*/
 }

@@ -6,12 +6,13 @@
     "mixins": [
       "PlayerServerMixin",
       "PlayerMixin",
-      "ContainerInventoryMixin"
+//      "ContainerInventoryMixin"
     ],
     "client": [
       "DisableDirectionWithAttModelZero",
       "SoundEngineMixin",
-      "PlayerLocalMixin"
+      "PlayerLocalMixin",
+//      "SoundSystemMixin",
     ],
     "injectors": {
         "defaultRequire": 1
