@@ -56,7 +56,6 @@ public class SongControlPacketC2S implements NetworkMessage
     }
 
     @Override
-	@Environment(EnvType.SERVER)
     public void handle(NetworkContext context)
     {
 		NetworkHandler.sendToAllPlayers(new SongControlPacketS2C(player_username, disc_id, song_action));
