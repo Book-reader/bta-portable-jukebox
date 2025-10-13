@@ -42,7 +42,7 @@ public class SongControlPacketS2C implements NetworkMessage
     {
 		packet.writeString(player_username);
 		packet.writeInt(song_action.ordinal());
-		if (song_action == SongAction.START_NEW)
+		if (song_action == SongAction.START_NEW || song_action == SongAction.RESUME)
 		{
 			packet.writeInt(disc_id);
 		}
@@ -54,7 +54,7 @@ public class SongControlPacketS2C implements NetworkMessage
     {
 		player_username = packet.readString();
 		song_action = SongAction.values()[packet.readInt()];
-		if (song_action == SongAction.START_NEW)
+		if (song_action == SongAction.START_NEW || song_action == SongAction.RESUME)
 		{
 			disc_id = packet.readInt();
 		}
@@ -84,7 +84,7 @@ public class SongControlPacketS2C implements NetworkMessage
 			switch (song_action) {
 				case START_NEW -> snd.bta_portable_jukebox$playDiscFrom((ItemDiscMusic) Item.getItem(disc_id), player);
 				case PAUSE, STOP -> snd.bta_portable_jukebox$pauseDiscFrom(player);
-				case RESUME -> snd.bta_portable_jukebox$resumeDiscFrom(player);
+				case RESUME -> snd.bta_portable_jukebox$resumeDiscFrom((ItemDiscMusic) Item.getItem(disc_id), player);
 			}
 		}
 

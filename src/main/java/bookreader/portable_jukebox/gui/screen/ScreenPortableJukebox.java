@@ -54,27 +54,24 @@ public class ScreenPortableJukebox extends ScreenContainerAbstract {
         PortableJukebox.LOGGER.debug("Button Pressed!");
         if (button.id == 0)
         {
+			ItemDiscMusic disk = ((PortableJukeboxItem)portable_jukebox_item.getItem()).getPlayingDisk(portable_jukebox_item);
             if (!SoundUtils.started())
             {
-                ItemDiscMusic disk = ((PortableJukeboxItem)portable_jukebox_item.getItem()).getPlayingDisk(portable_jukebox_item);
                 if (disk != null)
                 {
-//                    SoundUtils.playRecordAt(disk, player);
-//					if (mc.isMultiplayerWorld()) Net
 					NetworkHandler.sendToServer(new SongControlPacketC2S(player, disk, SongControlPacketS2C.SongAction.START_NEW));
                     PortableJukebox.LOGGER.debug("Started song");
                 }
             }
             else if (SoundUtils.playing())
             {
-//                SoundUtils.pause();
 				NetworkHandler.sendToServer(new SongControlPacketC2S(player, SongControlPacketS2C.SongAction.PAUSE));
                 PortableJukebox.LOGGER.debug("Paused song");
             }
             else
             {
-//                SoundUtils.unpause();
-				NetworkHandler.sendToServer(new SongControlPacketC2S(player, SongControlPacketS2C.SongAction.RESUME));
+				assert disk != null;
+				NetworkHandler.sendToServer(new SongControlPacketC2S(player, disk, SongControlPacketS2C.SongAction.RESUME));
                 PortableJukebox.LOGGER.debug("Unpaused song");
             }
         }
@@ -82,7 +79,6 @@ public class ScreenPortableJukebox extends ScreenContainerAbstract {
         {
             PortableJukebox.LOGGER.debug("Stopping track");
 			NetworkHandler.sendToServer(new SongControlPacketC2S(player, SongControlPacketS2C.SongAction.STOP));
-//            SoundUtils.stop();
         }
         super.buttonClicked(button);
     }
