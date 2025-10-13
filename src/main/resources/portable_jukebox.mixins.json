@@ -5,14 +5,12 @@
     "compatibilityLevel": "JAVA_17",
     "mixins": [
       "PlayerServerMixin",
-      "PlayerMixin",
-//      "ContainerInventoryMixin"
+      "PlayerMixin"
     ],
     "client": [
       "DisableDirectionWithAttModelZero",
       "SoundEngineMixin",
-      "PlayerLocalMixin",
-//      "SoundSystemMixin",
+      "PlayerLocalMixin"
     ],
     "injectors": {
         "defaultRequire": 1

@@ -3,8 +3,8 @@
   "id": "portable_jukebox",
   "version": "${version}",
 
-  "name": "Example Mod",
-  "description": "This mod aims to help new BTA modders.",
+  "name": "Portable Jukebox",
+  "description": "Take your music around with you",
   "authors": [
     "Book-reader"
   ],
@@ -14,7 +14,7 @@
   },
 
 	"icon": "icon.png",
-  "license": "CC0-1.0",
+  "license": "MIT",
 
   "environment": "*",
   "entrypoints": {
