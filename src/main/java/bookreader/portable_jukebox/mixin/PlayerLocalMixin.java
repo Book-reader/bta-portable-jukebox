@@ -28,7 +28,7 @@ public class PlayerLocalMixin implements DisplayPortableJukeboxScreen {
     @Override
     public void bta_portable_jukebox$displayPortableJukeboxScreen(ItemStack stack)
     {
-        PortableJukebox.LOGGER.info("displayPortableJukeboxScreen (Client)");
+//        PortableJukebox.LOGGER.info("displayPortableJukeboxScreen (Client)");
         this.mc.displayScreen(new ScreenPortableJukebox(((PlayerLocal)(Object)this).inventory, stack));
     }
 }

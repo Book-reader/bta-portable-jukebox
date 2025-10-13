@@ -14,6 +14,7 @@ import turniplabs.halplibe.helper.network.NetworkMessage;
 import turniplabs.halplibe.helper.network.UniversalPacket;
 
 import javax.annotation.Nonnull;
+import java.util.Optional;
 
 public class SongControlPacketS2C implements NetworkMessage
 {
@@ -64,8 +65,7 @@ public class SongControlPacketS2C implements NetworkMessage
 	@Environment(EnvType.CLIENT)
     public void handle(NetworkContext context)
     {
-		PortableJukebox.LOGGER.info("Handling packet (SongControlPacketS2C)");
-		// TODO: just return if it's the same player
+//		PortableJukebox.LOGGER.info("Handling packet (SongControlPacketS2C)");
 		if (player_username.equals(Minecraft.getMinecraft().thePlayer.username))
 		{
 			switch (song_action)
@@ -78,9 +78,10 @@ public class SongControlPacketS2C implements NetworkMessage
 		}
 		else
 		{
-			// TODO: handle dimensions
 			PlayDiscFromPlayer snd = (PlayDiscFromPlayer) Minecraft.getMinecraft().sndManager;
-			Player player = context.player.world.players.stream().filter((pl) -> pl.username.equals(player_username)).findFirst().get();
+			Optional<Player> _player = context.player.world.players.stream().filter((pl) -> pl.username.equals(player_username)).findFirst();
+			if (_player.isEmpty()) return;
+			Player player = _player.get();
 			switch (song_action) {
 				case START_NEW -> snd.bta_portable_jukebox$playDiscFrom((ItemDiscMusic) Item.getItem(disc_id), player);
 				case PAUSE, STOP -> snd.bta_portable_jukebox$pauseDiscFrom(player);

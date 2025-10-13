@@ -47,7 +47,7 @@ public abstract class PlayerServerMixin extends Player implements DisplayPortabl
 
     public void bta_portable_jukebox$displayPortableJukeboxScreen(ItemStack stack)
     {
-        PortableJukebox.LOGGER.info("displayPortableJukeboxScreen (Server)");
+//        PortableJukebox.LOGGER.info("displayPortableJukeboxScreen (Server)");
         this.getNextWindowId();
         NetworkHandler.sendToPlayer(this, new OpenGuiPacketS2C(stack, this.currentWindowId));
         this.craftingInventory.onCraftGuiClosed(this);
@@ -56,9 +56,9 @@ public abstract class PlayerServerMixin extends Player implements DisplayPortabl
         this.craftingInventory.addSlotListener(this);
 	}
 
-    @Inject(method = "updateInventorySlot(Lnet/minecraft/core/player/inventory/menu/MenuAbstract;ILnet/minecraft/core/item/ItemStack;)V", at = @At("HEAD"))
-    public void updateInventorySlot(MenuAbstract container, int i, ItemStack itemstack, CallbackInfo info)
-	{
-		PortableJukebox.LOGGER.error("Updating inventory slot!");
-	}
+//    @Inject(method = "updateInventorySlot(Lnet/minecraft/core/player/inventory/menu/MenuAbstract;ILnet/minecraft/core/item/ItemStack;)V", at = @At("HEAD"))
+//    public void updateInventorySlot(MenuAbstract container, int i, ItemStack itemstack, CallbackInfo info)
+//	{
+//		PortableJukebox.LOGGER.error("Updating inventory slot!");
+//	}
 }

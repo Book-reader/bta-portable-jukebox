@@ -55,7 +55,7 @@ public class OpenGuiPacketS2C implements NetworkMessage {
 
     @Override
 	@Environment(EnvType.CLIENT)
-    public void handleClientEnv(NetworkContext context)
+    public void handle(NetworkContext context)
     {
 //        PortableJukebox.LOGGER.info("Handling packet (OpenGuiPacket), windowId = {}, stack = {}, player = {}", windowId, stack, Minecraft.getMinecraft().thePlayer.toString());
         assert this.stack != null;

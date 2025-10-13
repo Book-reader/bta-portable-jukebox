@@ -13,7 +13,9 @@ import net.minecraft.client.sound.SoundRepository;
 import net.minecraft.core.entity.Mob;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.ItemDiscMusic;
+import net.minecraft.core.lang.I18n;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -53,6 +55,9 @@ public abstract class SoundEngineMixin implements PlayDiscFromPlayer
 	@Shadow
 	protected abstract boolean isLoaded();
 
+	@Shadow
+	@Final
+	public static String BG_MUSIC;
 	@Unique
 	Map<Player, String> listeningDiscsFrom = new HashMap<>();
 
@@ -72,7 +77,17 @@ public abstract class SoundEngineMixin implements PlayDiscFromPlayer
 		}
 		SoundEntry record_sound = SoundRepository.SOUNDS.getSoundEntry(record.recordName);
 		assert record_sound != null;
-		this.playSoundWithIdAtPos(record_sound, SoundCategory.MUSIC, (float)player.x, (float)player.y, (float)player.z, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, mc.gameSettings) * record_sound.volume, record_sound.pitch, record.recordName);
+		if (soundSystem.playing(SoundEngine.BG_MUSIC)) soundSystem.stop(SoundEngine.BG_MUSIC);
+		this.playSoundWithIdAtPos(record_sound, SoundCategory.MUSIC, (float)player.x, (float)player.y, (float)player.z, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, mc.gameSettings) * record_sound.volume, record_sound.pitch, category_name);
+
+		if (record.recordAuthor != null)
+		{
+			mc.hudIngame.setRecordPlayingMessage(record.recordAuthor + " - " + I18n.getInstance().translateKey(record.recordName));
+		}
+		else
+		{
+			mc.hudIngame.setRecordPlayingMessage(I18n.getInstance().translateKey(record.getKey()));
+		}
 	}
 
 	@Override
@@ -91,7 +106,7 @@ public abstract class SoundEngineMixin implements PlayDiscFromPlayer
 		}
 		else
 		{
-			this.bta_portable_jukebox$playDiscFrom(record, player);
+//			this.bta_portable_jukebox$playDiscFrom(record, player);
 		}
 	}
 
@@ -104,7 +119,7 @@ public abstract class SoundEngineMixin implements PlayDiscFromPlayer
 			if (soundSystem.playing(category))
 			{
 				Player player = entry.getKey();
-				PortableJukebox.LOGGER.info("Setting source position to x={}, y={}, z={}", player.x, player.y, player.z);
+//				PortableJukebox.LOGGER.info("Setting source position to x={}, y={}, z={}", player.x, player.y, player.z);
 				soundSystem.setPosition(category, (float) player.x, (float) player.y, (float) player.z);
 			}
 		}
@@ -116,24 +131,26 @@ public abstract class SoundEngineMixin implements PlayDiscFromPlayer
 //
 //	}
 
-/*    @WrapOperation(method = "tick()V", at = @At(value = "INVOKE", target = "playing(Ljava/lang/String;)Z"))
+    @WrapOperation(method = "tick()V", at = @At(value = "INVOKE", target = "Lpaulscode/sound/SoundSystem;playing(Ljava/lang/String;)Z"))
     public boolean soundSystemPlaying(SoundSystem system, String name, Operation<Boolean> original)
     {
         if (Objects.equals(name, SoundEngine.BG_MUSIC)) return original.call(system, name) || system.playing(SoundUtils.SOUND_CATEGORY);
         else return original.call(system, name);
     }
 
-    @WrapOperation(method = "stopMusic()V", at = @At(value = "INVOKE", target = "stop(Ljava/lang/String;)V"))
-    public void soundSystemStop(SoundSystem system, String name, Operation<Void> original)
+    @Inject(method = "stopMusic()V", at = @At(value = "INVOKE", target = "Ljava/util/concurrent/locks/Lock;unlock()V"))
+    public void soundSystemStop(CallbackInfo ci)
     {
-        if (Objects.equals(name, SoundEngine.BG_MUSIC) && system.playing(SoundUtils.SOUND_CATEGORY))
-        {
-            PortableJukebox.LOGGER.info("Stopping music!");
-            system.stop(SoundUtils.SOUND_CATEGORY);
-        }
-        if (system.playing(name)) original.call(system, name);
+		if (this.isLoaded())
+		{
+			soundSystem.stop(SoundUtils.SOUND_CATEGORY);
+			for (String disc_cat : listeningDiscsFrom.values())
+			{
+				soundSystem.stop(disc_cat);
+			}
+		}
     }
-*/
+
     /*@WrapOperation(method = "setMuted(Z)V", at = @At(value = "INVOKE", target = "setVolume(Ljava/lang/String;F)V"))
     public void soundSystemSetVolume(SoundSystem system, String name, float vol, Operation<Void> original)
     {
@@ -141,7 +158,7 @@ public abstract class SoundEngineMixin implements PlayDiscFromPlayer
         original.call(system, name, vol);
     }*/
 	@Inject(method = "setMuted(Z)V", at = @At(value = "INVOKE", target = "Ljava/util/concurrent/locks/Lock;unlock()V"))
-	public void soundSystemSetVolume(boolean muted, CallbackInfo ci)
+	public void onSetMuted(boolean muted, CallbackInfo ci)
 	{
 		if (!this.isLoaded()) return;
 		if (muted) {
@@ -151,7 +168,7 @@ public abstract class SoundEngineMixin implements PlayDiscFromPlayer
 				soundSystem.setVolume(disc_cat, 0.0f);
 			}
 		} else {
-			soundSystem.setVolume("BgMusic", SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, this.options));
+			soundSystem.setVolume(SoundUtils.SOUND_CATEGORY, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, this.options));
 			for (String disc_cat : listeningDiscsFrom.values())
 			{
 				soundSystem.setVolume(disc_cat, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, this.options));
@@ -166,7 +183,7 @@ public abstract class SoundEngineMixin implements PlayDiscFromPlayer
             soundSystem.setVolume(SoundUtils.SOUND_CATEGORY, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, this.options));
 			for (String disc_cat : listeningDiscsFrom.values())
 			{
-				soundSystem.setVolume(disc_cat, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, this.options));
+				if (soundSystem.playing(disc_cat)) soundSystem.setVolume(disc_cat, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, this.options));
 			}
         }
     }
