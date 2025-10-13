@@ -7,6 +7,7 @@ import bookreader.portable_jukebox.packet.SongControlPacketC2S;
 import bookreader.portable_jukebox.packet.SongControlPacketS2C;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.core.data.registry.Registries;
 import net.minecraft.core.item.Item;
 
 import org.slf4j.Logger;
@@ -19,37 +20,40 @@ import turniplabs.halplibe.util.RecipeEntrypoint;
 
 public class PortableJukebox implements ModInitializer, RecipeEntrypoint, GameStartEntrypoint, DedicatedServerModInitializer {
 	public static final String MOD_ID = "portable_jukebox";
-    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	public static Item PORTABLE_JUKEBOX;
-    @Override
-    public void onInitialize() {
-        LOGGER.info("portable_jukebox initialized.");
+
+	@Override
+	public void onInitialize() {
+		LOGGER.info("portable_jukebox initialized.");
 		NetworkHandler.registerNetworkMessage(OpenGuiPacketS2C::new);
 		NetworkHandler.registerNetworkMessage(SaveNBTPacketC2S::new);
 		NetworkHandler.registerNetworkMessage(SongControlPacketS2C::new);
 		NetworkHandler.registerNetworkMessage(SongControlPacketC2S::new);
-		// PacketContainerSetContent
-    }
-
-	@Override
-	public void onRecipesReady() {
-
 	}
 
 	@Override
-	public void initNamespaces() {
-
+	public void onRecipesReady()
+	{
+		Recipes.initRecipes();
 	}
 
 	@Override
-	public void beforeGameStart() {
+	public void initNamespaces()
+	{
+		Recipes.initNameSpaces();
+	}
+
+	@Override
+	public void beforeGameStart()
+	{
 		PORTABLE_JUKEBOX = new ItemBuilder(MOD_ID).build(new PortableJukeboxItem());
-		// NetworkHandler.sendToPlayer(null, new OpenGuiPacketC2S());
 	}
 
 	@Override
-	public void afterGameStart() {
+	public void afterGameStart()
+	{
 
 	}
 
@@ -59,8 +63,8 @@ public class PortableJukebox implements ModInitializer, RecipeEntrypoint, GameSt
 	}
 
 	@Override
-	public void onInitializeServer() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'onInitializeServer'");
+	public void onInitializeServer()
+	{
+
 	}
 }

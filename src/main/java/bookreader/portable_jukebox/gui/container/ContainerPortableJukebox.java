@@ -1,6 +1,7 @@
 package bookreader.portable_jukebox.gui.container;
 
 import bookreader.portable_jukebox.gui.menu.MenuPortableJukebox;
+import net.minecraft.core.player.inventory.InventorySorter;
 import net.minecraft.core.player.inventory.menu.MenuAbstract;
 import org.jetbrains.annotations.Nullable;
 
@@ -76,7 +77,7 @@ public class ContainerPortableJukebox implements Container {
 
     @Override
     public void setChanged() {
-		PortableJukebox.LOGGER.info("setChanged");
+//		PortableJukebox.LOGGER.info("setChanged");
 		writeNbt();
 		if (!EnvironmentHelper.isServerEnvironment())
 		{
@@ -108,7 +109,7 @@ public class ContainerPortableJukebox implements Container {
 
     @Override
     public void sortContainer() {
-        PortableJukebox.LOGGER.info("TODO: PortableJukeboxContainer.sortContainer");
+		InventorySorter.sortInventory(this.storage, 1, this.storage.length);
     }
 
     @Override
