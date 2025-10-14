@@ -117,38 +117,31 @@ public class SoundUtils {
     {
 		SoundSystem snd = get_snd();
 		if (snd == null) return;
+        SoundEntry record_sound = SoundRepository.SOUNDS.getSoundEntry(record.recordName);
         try
         {
-            SoundEntry record_sound = SoundRepository.SOUNDS.getSoundEntry(record.recordName);
-            try
-            {
-                LOCK.lock();
-                started = true;
-                paused = false;
-                current_record = record;
-                if (snd.playing(SOUND_CATEGORY)) snd.stop(SOUND_CATEGORY);
-                snd.backgroundMusic(SOUND_CATEGORY, record_sound.getURL(), record_sound.name, false);
-                snd.setPitch(SOUND_CATEGORY, record_sound.pitch);
-                snd.setVolume(SOUND_CATEGORY, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, mc.gameSettings) * record_sound.volume);
+            LOCK.lock();
+            started = true;
+            paused = false;
+            current_record = record;
+            if (snd.playing(SOUND_CATEGORY)) snd.stop(SOUND_CATEGORY);
+            snd.backgroundMusic(SOUND_CATEGORY, record_sound.getURL(), record_sound.name, false);
+            snd.setPitch(SOUND_CATEGORY, record_sound.pitch);
+            snd.setVolume(SOUND_CATEGORY, SoundCategoryHelper.getEffectiveVolume(SoundCategory.MUSIC, mc.gameSettings) * record_sound.volume);
 
-                snd.play(SOUND_CATEGORY);
-            } finally
-            {
-                LOCK.unlock();
-            }
-
-            if (record.recordAuthor != null)
-            {
-                mc.hudIngame.setRecordPlayingMessage(record.recordAuthor + " - " + I18n.getInstance().translateKey(record.recordName));
-            }
-            else
-            {
-                mc.hudIngame.setRecordPlayingMessage(I18n.getInstance().translateKey(record.getKey()));
-            }
-        }
-        catch (Exception e)
+            snd.play(SOUND_CATEGORY);
+        } finally
         {
-            throw new RuntimeException(e);
+            LOCK.unlock();
+        }
+
+        if (record.recordAuthor != null)
+        {
+            mc.hudIngame.setRecordPlayingMessage(record.recordAuthor + " - " + I18n.getInstance().translateKey(record.recordName));
+        }
+        else
+        {
+            mc.hudIngame.setRecordPlayingMessage(I18n.getInstance().translateKey(record.getKey()));
         }
     }
 
