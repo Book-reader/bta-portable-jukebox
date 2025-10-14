@@ -147,8 +147,13 @@ public class SoundUtils {
             }
         }
         catch (Exception e)
-        {
-            throw new RuntimeException(e);
+		{
+
+			mc.hudIngame.setRecordPlayingMessage("Failed to get record name!");
+			// Commenting this out allows custom records to play instead of crashing the client
+			// Probably some unhandled crash handling stuff
+			// -Nova
+			//throw new RuntimeException(e);
         }
     }
 

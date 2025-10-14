@@ -109,7 +109,11 @@ public class ContainerPortableJukebox implements Container {
 
     @Override
     public void sortContainer() {
-		InventorySorter.sortInventory(this.storage, 1, this.storage.length);
+		// This feels incredibly hacky to me but it prevents the sorting crash
+		// You should probably look into why this crashes at all.
+		// -Nova
+
+		InventorySorter.sortInventory(this.storage, 1, this.storage.length-1);
     }
 
     @Override
