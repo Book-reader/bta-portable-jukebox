@@ -27,7 +27,6 @@ import paulscode.sound.SoundSystem;
 @Environment(EnvType.CLIENT)
 public class SoundUtils {
     public static final String SOUND_CATEGORY = "PortableMusic";
-//	public static final int SOUND_COMMAND = SOUND_CATEGORY.hashCode();
 
 	private static boolean started = false;
 	private static boolean paused = false;
@@ -39,7 +38,6 @@ public class SoundUtils {
 	{
 		return SoundEngine.getSoundSystem();
 	}
-//	private static final SoundSystem snd = SoundEngine.getSoundSystem();
 
     public static boolean playing()
     {
@@ -47,17 +45,6 @@ public class SoundUtils {
 		if (s == null) return false;
         return inLock(() -> s.playing(SOUND_CATEGORY));
     }
-
-//	// TODO: these methods belong in a separate class, same as the ability to play songs from a specific player in playRecordAt because these don't need to handle the pause state
-//	public static void pauseFrom(Player player)
-//	{
-//		throw new UnsupportedOperationException("TODO");
-//	}
-//
-//	public static void resumeFrom(Player player)
-//	{
-//		throw new UnsupportedOperationException("TODO");
-//	}
 
     public static void pause()
     {
