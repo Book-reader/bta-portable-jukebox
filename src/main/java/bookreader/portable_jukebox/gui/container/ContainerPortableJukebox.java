@@ -118,7 +118,7 @@ public class ContainerPortableJukebox implements Container {
 
     @Override
     public boolean stillValid(Player player) {
-        return player.getHeldItem() != null && player.getHeldItem().equals(portable_jukebox_item);
+        return player.getHeldItem() != null && ItemStack.areItemStacksEqual(player.getHeldItem(), portable_jukebox_item);
     }
 
     void writeNbt()
