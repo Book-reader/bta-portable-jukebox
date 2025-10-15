@@ -59,7 +59,13 @@ public class MenuPortableJukebox extends MenuAbstract {
     @Override
     public List<Integer> getTargetSlots(InventoryAction inventoryAction, Slot slot, int i, Player player)
 	{
-		// TODO: insert into playing slot if empty
+		if (this.getSlot(0).getItemStack() == null && slot.index > 0 && slot.index < this.storage.getContainerSize())
+		{
+			List<Integer> s = this.getSlots(0, 1, false);
+			s.addAll(this.getSlots(this.storage.getContainerSize(), ContainerInventory.playerMainInventorySize(), true));
+			return s;
+		}
+		if (slot.index == 0) return this.getSlots(1, this.storage.getContainerSize() + ContainerInventory.playerMainInventorySize() - 1, false);
 		return slot.index < this.storage.getContainerSize() ? this.getSlots(this.storage.getContainerSize(), ContainerInventory.playerMainInventorySize(), true) : this.getSlots(0, this.storage.getContainerSize(), false);
     }
 

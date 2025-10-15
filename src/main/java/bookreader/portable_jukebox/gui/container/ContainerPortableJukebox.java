@@ -71,7 +71,7 @@ public class ContainerPortableJukebox implements Container {
 		writeNbt();
 		if (!EnvironmentHelper.isServerEnvironment())
 		{
-			if (storage[0] == null || storage[0].getItem().id != SoundUtils.currentRecord().id)
+			if (storage[0] == null || (SoundUtils.currentRecord() != null && storage[0].getItem().id != SoundUtils.currentRecord().id))
 			{
 				SoundUtils.stop();
 			}

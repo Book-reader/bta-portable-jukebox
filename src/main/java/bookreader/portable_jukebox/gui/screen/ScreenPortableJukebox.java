@@ -70,7 +70,6 @@ public class ScreenPortableJukebox extends ScreenContainerAbstract {
     @Override
     public void render(int mx, int my, float partialTick)
     {
-		super.render(mx, my, partialTick);
 		if (!SoundUtils.playing())
         {
 			buttons.get(0).displayString = "|>";
@@ -80,7 +79,8 @@ public class ScreenPortableJukebox extends ScreenContainerAbstract {
 		}
 		// TODO: there has to be a better way (referring to started_noupdate)
 		buttons.get(1).enabled = SoundUtils.started_noupdate();
-    }
+		super.render(mx, my, partialTick);
+	}
 
     protected void drawGuiContainerBackgroundLayer(float f) {
 		GL11.glEnable(GL11.GL_BLEND);
