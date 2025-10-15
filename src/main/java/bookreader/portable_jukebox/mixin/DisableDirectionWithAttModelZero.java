@@ -11,10 +11,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import bookreader.portable_jukebox.SoundUtils;
-import bookreader.portable_jukebox.item.PortableJukeboxItem;
 import net.betterthanadventure.sound.ChannelLWJGL3OpenAL;
 import net.betterthanadventure.sound.SourceLWJGL3OpenAL;
-import net.minecraft.client.sound.SoundEngine;
 import paulscode.sound.FilenameURL;
 import paulscode.sound.SoundBuffer;
 import paulscode.sound.Source;

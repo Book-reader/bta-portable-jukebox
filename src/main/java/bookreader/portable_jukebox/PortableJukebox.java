@@ -26,7 +26,7 @@ public class PortableJukebox implements ModInitializer, RecipeEntrypoint, GameSt
 
 	@Override
 	public void onInitialize() {
-		LOGGER.info("portable_jukebox initialized.");
+		LOGGER.info("{} initialized.", MOD_ID);
 		NetworkHandler.registerNetworkMessage(OpenGuiPacketS2C::new);
 		NetworkHandler.registerNetworkMessage(SaveNBTPacketC2S::new);
 		NetworkHandler.registerNetworkMessage(SongControlPacketS2C::new);
@@ -52,10 +52,7 @@ public class PortableJukebox implements ModInitializer, RecipeEntrypoint, GameSt
 	}
 
 	@Override
-	public void afterGameStart()
-	{
-
-	}
+	public void afterGameStart() {}
 
 	public static String makeItemNamespace(String item_name)
 	{

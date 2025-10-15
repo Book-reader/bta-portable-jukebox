@@ -4,7 +4,6 @@ import javax.annotation.Nonnull;
 
 import com.mojang.nbt.tags.CompoundTag;
 
-import bookreader.portable_jukebox.PortableJukebox;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.entity.player.Player;
@@ -25,7 +24,6 @@ public class SaveNBTPacketC2S implements NetworkMessage {
     @Environment(EnvType.CLIENT)
     public void encodeToUniversalPacket(@Nonnull UniversalPacket packet)
     {
-//        PortableJukebox.LOGGER.info("Encoding packet (SaveNBTPacketC2S)");
         assert this.nbt != null;
         packet.writeCompoundTag(nbt);
     }
@@ -34,7 +32,6 @@ public class SaveNBTPacketC2S implements NetworkMessage {
     @Environment(EnvType.SERVER)
     public void decodeFromUniversalPacket(@Nonnull UniversalPacket packet)
     {
-//        PortableJukebox.LOGGER.info("Decoding packet (SaveNBTPacketC2S)");
         this.nbt = packet.readCompoundTag();
         assert this.nbt != null;
     }
@@ -42,9 +39,9 @@ public class SaveNBTPacketC2S implements NetworkMessage {
     @Override
     public void handle(NetworkContext context)
     {
-//        PortableJukebox.LOGGER.info("Handling packet (SaveNBTPacketC2S)");
         assert this.nbt != null;
         Player player = context.player;
+		assert player.getHeldItem() != null;
         player.getHeldItem().setData(nbt);
     }
 }

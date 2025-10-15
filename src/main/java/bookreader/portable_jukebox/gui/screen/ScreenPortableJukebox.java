@@ -1,6 +1,5 @@
 package bookreader.portable_jukebox.gui.screen;
 
-import bookreader.portable_jukebox.PortableJukebox;
 import bookreader.portable_jukebox.SoundUtils;
 import bookreader.portable_jukebox.gui.menu.MenuPortableJukebox;
 import bookreader.portable_jukebox.item.PortableJukeboxItem;
@@ -32,26 +31,16 @@ public class ScreenPortableJukebox extends ScreenContainerAbstract {
     public void init()
     {
 		super.init();
-//		int i = 113;
-//		this.ySize = i + PortableJukeboxItem.STORAGE_SIZE * 2;
 		this.left = (this.width - this.xSize) / 2;
 		this.top = (this.height - this.ySize) / 2;
 		this.buttons.clear();
 		this.buttons.add(new ButtonElement(0, left + 7 + 18 + 1, top + 7, 18, 18, "||")); // I18n.getInstance().translateKey("gui.achievements.button.done")
 		this.buttons.add(new ButtonElement(1, left + 7 + (18 + 1) * 2, top + 7, 18, 18, "<"));
-//		this.passEvents = false;
     }
-
-//	public void removed()
-//	{
-//		super.removed();
-//		this.inventorySlots.onCraftGuiClosed(this.mc.thePlayer);
-//	}
 
     @Override
     protected void buttonClicked(ButtonElement button)
     {
-        PortableJukebox.LOGGER.debug("Button Pressed!");
         if (button.id == 0)
         {
 			ItemDiscMusic disk = ((PortableJukeboxItem)portable_jukebox_item.getItem()).getPlayingDisk(portable_jukebox_item);
@@ -60,24 +49,19 @@ public class ScreenPortableJukebox extends ScreenContainerAbstract {
                 if (disk != null)
                 {
 					NetworkHandler.sendToServer(new SongControlPacketC2S(player, disk, SongControlPacketS2C.SongAction.START_NEW));
-                    PortableJukebox.LOGGER.debug("Started song");
                 }
             }
             else if (SoundUtils.playing())
             {
 				NetworkHandler.sendToServer(new SongControlPacketC2S(player, SongControlPacketS2C.SongAction.PAUSE));
-                PortableJukebox.LOGGER.debug("Paused song");
             }
             else
             {
-				assert disk != null;
-				NetworkHandler.sendToServer(new SongControlPacketC2S(player, disk, SongControlPacketS2C.SongAction.RESUME));
-                PortableJukebox.LOGGER.debug("Unpaused song");
+				NetworkHandler.sendToServer(new SongControlPacketC2S(player, SongControlPacketS2C.SongAction.RESUME));
             }
         }
         else if (button.id == 1 && button.enabled)
         {
-            PortableJukebox.LOGGER.debug("Stopping track");
 			NetworkHandler.sendToServer(new SongControlPacketC2S(player, SongControlPacketS2C.SongAction.STOP));
         }
         super.buttonClicked(button);
@@ -98,12 +82,10 @@ public class ScreenPortableJukebox extends ScreenContainerAbstract {
 		buttons.get(1).enabled = SoundUtils.started_noupdate();
     }
 
-    // private ItemDiscMusic disc;
-//    @Override
     protected void drawGuiContainerBackgroundLayer(float f) {
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.textureManager.loadTexture("/assets/portable_jukebox/textures/gui/container/portable_jukebox_screen.png").bind();
-        this.drawTexturedModalRect(left, top, 0, 0, this.xSize, this.ySize/*, 0.006, 0.006*/);
+        this.drawTexturedModalRect(left, top, 0, 0, this.xSize, this.ySize);
     }
 }

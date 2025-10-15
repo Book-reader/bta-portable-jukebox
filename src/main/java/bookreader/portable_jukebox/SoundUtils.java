@@ -4,24 +4,17 @@ import java.lang.reflect.Field;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 
-import bookreader.portable_jukebox.gui.screen.ScreenPortableJukebox;
-import bookreader.portable_jukebox.util.Util;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.PlayerLocal;
-import net.minecraft.client.option.GameSettings;
 import net.minecraft.client.sound.SoundCategoryHelper;
 import net.minecraft.client.sound.SoundEngine;
 import net.minecraft.client.sound.SoundEntry;
 import net.minecraft.client.sound.SoundRepository;
-import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.ItemDiscMusic;
 import net.minecraft.core.lang.I18n;
 import net.minecraft.core.sound.SoundCategory;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import paulscode.sound.CommandObject;
 import paulscode.sound.SoundSystem;
 
 @Environment(EnvType.CLIENT)
@@ -100,7 +93,7 @@ public class SoundUtils {
         return current_record;
     }
 
-    public static void playRecordAt(ItemDiscMusic record, Player player)
+    public static void playRecord(ItemDiscMusic record)
     {
 		SoundSystem snd = get_snd();
 		if (snd == null) return;

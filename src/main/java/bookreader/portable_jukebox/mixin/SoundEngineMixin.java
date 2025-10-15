@@ -49,15 +49,10 @@ public abstract class SoundEngineMixin implements PlayDiscFromPlayer
 	@Shadow
 	private Minecraft mc;
 	@Shadow
-//	public void playMusic(SoundEntry entry, float x, float y, float z, float volume, float pitch) {throw new AssertionError();}
 	public void playSoundWithIdAtPos(SoundEntry entry, SoundCategory category, float x, float y, float z, float volume, float pitch, String soundID) {throw new AssertionError();}
 
 	@Shadow
 	protected abstract boolean isLoaded();
-
-	@Shadow
-	@Final
-	public static String BG_MUSIC;
 	@Unique
 	Map<Player, String> listeningDiscsFrom = new HashMap<>();
 
@@ -68,7 +63,7 @@ public abstract class SoundEngineMixin implements PlayDiscFromPlayer
 		if (listeningDiscsFrom.containsKey(player))
 		{
 			category_name = listeningDiscsFrom.get(player);
-			soundSystem.stop(category_name);
+			if (soundSystem.playing(category_name)) soundSystem.stop(category_name);
 		}
 		else
 		{
@@ -99,14 +94,10 @@ public abstract class SoundEngineMixin implements PlayDiscFromPlayer
 	}
 
 	@Override
-	public void bta_portable_jukebox$resumeDiscFrom(ItemDiscMusic record, Player player) {
+	public void bta_portable_jukebox$resumeDiscFrom(Player player) {
 		if (listeningDiscsFrom.containsKey(player))
 		{
 			soundSystem.play(listeningDiscsFrom.get(player));
-		}
-		else
-		{
-//			this.bta_portable_jukebox$playDiscFrom(record, player);
 		}
 	}
 
@@ -119,17 +110,10 @@ public abstract class SoundEngineMixin implements PlayDiscFromPlayer
 			if (soundSystem.playing(category))
 			{
 				Player player = entry.getKey();
-//				PortableJukebox.LOGGER.info("Setting source position to x={}, y={}, z={}", player.x, player.y, player.z);
 				soundSystem.setPosition(category, (float) player.x, (float) player.y, (float) player.z);
 			}
 		}
 	}
-
-//	@Inject(method = "tick()V", at = @At(value = "INVOKE", target = "Ljava/util/concurrent/locks/Lock;unlock()V"))
-//	public void onTick(CallbackInfo ci)
-//	{
-//
-//	}
 
     @WrapOperation(method = "tick()V", at = @At(value = "INVOKE", target = "Lpaulscode/sound/SoundSystem;playing(Ljava/lang/String;)Z"))
     public boolean soundSystemPlaying(SoundSystem system, String name, Operation<Boolean> original)
@@ -151,12 +135,6 @@ public abstract class SoundEngineMixin implements PlayDiscFromPlayer
 		}
     }
 
-    /*@WrapOperation(method = "setMuted(Z)V", at = @At(value = "INVOKE", target = "setVolume(Ljava/lang/String;F)V"))
-    public void soundSystemSetVolume(SoundSystem system, String name, float vol, Operation<Void> original)
-    {
-        if (Objects.equals(name, SoundEngine.BG_MUSIC)) system.setVolume(SoundUtils.SOUND_CATEGORY, vol);
-        original.call(system, name, vol);
-    }*/
 	@Inject(method = "setMuted(Z)V", at = @At(value = "INVOKE", target = "Ljava/util/concurrent/locks/Lock;unlock()V"))
 	public void onSetMuted(boolean muted, CallbackInfo ci)
 	{

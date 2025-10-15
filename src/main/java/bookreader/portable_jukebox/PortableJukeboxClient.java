@@ -17,8 +17,9 @@ public class PortableJukeboxClient implements ModelEntrypoint {
 	public void initBlockModels(BlockModelDispatcher dispatcher) {}
 
 	@Override
-	public void initItemModels(ItemModelDispatcher dispatcher) {
-		ModelHelper.setItemModel(PortableJukebox.PORTABLE_JUKEBOX, ()->new ItemModelStandard(PortableJukebox.PORTABLE_JUKEBOX, null).setIcon(PortableJukebox.makeItemNamespace("portable_jukebox")));
+	public void initItemModels(ItemModelDispatcher dispatcher)
+	{
+		ModelHelper.setItemModel(PortableJukebox.PORTABLE_JUKEBOX, ()-> new ItemModelStandard(PortableJukebox.PORTABLE_JUKEBOX, null).setIcon(PortableJukebox.makeItemNamespace("portable_jukebox")));
 	}
 
 	@Override

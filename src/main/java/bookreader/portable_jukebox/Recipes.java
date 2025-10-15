@@ -14,14 +14,6 @@ public class Recipes extends RecipeRegistry {
 	public static final RecipeNamespace PORTABLE_JUKEBOX = new RecipeNamespace();
 
 	public static void initRecipes() {
-//		RecipeBuilder.Shaped(PortableJukebox.MOD_ID)
-//			.setShape(
-//				"rrr",
-//				"rdr",
-//				"rrr")
-//			.addInput('r', yourItemHere) // Replace with your input item/block
-//			.addInput('d', Item.foodAppleGold) // Example of another input item
-//			.create("YourRecipeName", new PortableJukeboxItem().getDefaultStack()); // Replace with your output item/block
 		RecipeBuilder.Shapeless(PortableJukebox.MOD_ID)
 			.addInput(Blocks.JUKEBOX.getDefaultStack())
 			.addInput("minecraft:chests")
